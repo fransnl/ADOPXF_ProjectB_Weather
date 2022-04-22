@@ -20,6 +20,7 @@ namespace Weather.Views
     {
         OpenWeatherService service;
         GroupedForecast groupedforecast;
+        string city;
 
         public ForecastPage()
         {
@@ -35,6 +36,8 @@ namespace Weather.Views
 
             //Code here will run right before the screen appears
             //You want to set the Title or set the City
+            city = this.Title; 
+            
 
             //This is making the first load of data
             MainThread.BeginInvokeOnMainThread(async () => {await LoadForecast();});
@@ -42,7 +45,18 @@ namespace Weather.Views
 
         private async Task LoadForecast()
         {
-            //Heare you load the forecast 
+            //Here you load the forecast
+            
+            var result = await service.GetForecastAsync(city);
+
+            groupedforecast.City = result.City;
+            groupedforecast.Items = result.Items.GroupBy(x => x.DateTime.Date);
+            WeatherDataList.ItemsSource = groupedforecast.Items;
+        }
+
+        private async void MenuItem_OnClicked(object sender, EventArgs e) 
+        {
+            await LoadForecast();
         }
     }
 }
